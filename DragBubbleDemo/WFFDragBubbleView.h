@@ -32,10 +32,7 @@
 @property (nonatomic, assign) CGFloat touchCircleRadius;
 
 // 拖拽时，触摸点与圆心形成的直线，与圆和触摸点形成的圆形成的两个交点。分别向各自圆弧两边偏移固定角度【该变量】后各产生两个点。两对点各自以贝塞尔曲线连接，形成拖拽效果。[0-90°]
-@property (nonatomic, assign) CGFloat offsetRadian;
-
-// 显示在圆上的汉字
-@property (nonatomic, strong) NSString *info;
+@property (nonatomic, assign) CGFloat offsetRadian;// 即为示意图中白色虚线与红色虚线的夹角
 
 // 恢复初始状态
 - (void)restore;
