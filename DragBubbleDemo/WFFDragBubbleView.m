@@ -20,7 +20,9 @@
 
 @property (nonatomic, assign) CGPoint touchPoint;
 
-@property (nonatomic, strong) CAShapeLayer *shapeLayer;
+@property (nonatomic, strong) CAShapeLayer *shapeLayer;// 连接段
+
+@property (nonatomic, strong) CAShapeLayer *subShapeLayer;// 两个圆
 
 @end
 
@@ -100,13 +102,25 @@
         self.shapeLayer.fillColor = [UIColor redColor].CGColor;
         self.shapeLayer.frame = CGRectMake(0, 0, self.circleRadius * 2, self.circleRadius * 2);
         self.shapeLayer.position = [self circlePoint];
-        self.shapeLayer.backgroundColor = [UIColor yellowColor].CGColor;
         [self.layer addSublayer:self.shapeLayer];
+    }
+    
+    if (!self.subShapeLayer) {
+        self.subShapeLayer = [CAShapeLayer layer];
+        self.subShapeLayer.strokeColor = [UIColor clearColor].CGColor;
+        self.subShapeLayer.fillColor = [UIColor redColor].CGColor;
+        self.subShapeLayer.frame = self.shapeLayer.bounds;
+        [self.shapeLayer addSublayer:self.subShapeLayer];
     }
 }
 
 - (void)removeLayer
 {
+    if (self.subShapeLayer) {
+        [self.subShapeLayer removeFromSuperlayer];
+        self.subShapeLayer = nil;
+    }
+    
     if (self.shapeLayer) {
         [self.shapeLayer removeFromSuperlayer];
         self.shapeLayer = nil;
@@ -115,9 +129,7 @@
 // 未设置过的项，设置默认值。
 - (void)defaultInit
 {
-    if (self.maxDistance == 0) {
-        self.maxDistance = 200;
-    }
+    self.layer.masksToBounds = NO;
     
     if (CGPointEqualToPoint(self.circlePoint, CGPointZero)) {
         self.circlePoint = [self convertPoint:self.center fromView:self.superview];
@@ -125,6 +137,10 @@
     
     if (self.circleRadius == 0) {
         self.circleRadius = MIN(self.bounds.size.width, self.bounds.size.height) / 2;
+    }
+    
+    if (self.maxDistance == 0) {
+        self.maxDistance = self.circleRadius * 6;
     }
     
     if (self.touchCircleRadius == 0) {
@@ -200,35 +216,35 @@
     // 圆上的两个点
     CGFloat radian = [self radianWithPoint:touchPoint onCirclePoint:circlePoint radius:newRadius];// 获取直线与圆的交点。
     CGPoint point1 = [self pointWithRadian:radian + self.offsetRadian onCirclePoint:circlePoint radius:newRadius];
-    //    CGPoint point2 = [self pointWithRadian:radian - self.offsetRadian onCirclePoint:circlePoint radius:newRadius];
+        CGPoint point2 = [self pointWithRadian:radian - self.offsetRadian onCirclePoint:circlePoint radius:newRadius];
     
     // 拖拽产生的圆的对应的两个点【顺序有关】
     CGFloat radianForTouch = radian + M_PI;// 拖拽产生的圆的交点在另一面，+180°
-    //    CGPoint point1ForTouch = [self pointWithRadian:radianForTouch - self.offsetRadian onCirclePoint:touchPoint radius:[self touchCircleRadius]];
+        CGPoint point1ForTouch = [self pointWithRadian:radianForTouch - self.offsetRadian onCirclePoint:touchPoint radius:[self touchCircleRadius]];
     CGPoint point2ForTouch = [self pointWithRadian:radianForTouch + self.offsetRadian onCirclePoint:touchPoint radius:[self touchCircleRadius]];
     
     CGPoint controlPoint = CGPointMake((circlePoint.x + touchPoint.x) / 2, (circlePoint.y + touchPoint.y) / 2);
     
+    UIBezierPath *circlePath = [[UIBezierPath alloc] init];
     UIBezierPath *path = [[UIBezierPath alloc] init];
     if (!_isOutRange) {
-        if ([self distanceFromPoint:touchPoint toPoint:circlePoint] < ([self circleRadius])) {// 在原来的圆内，保留原来的圆
-            [path addArcWithCenter:circlePoint radius:newRadius startAngle:0 endAngle:M_PI * 2 clockwise:1];
-        } else {
-            [path moveToPoint:point1];
-            
-            [path addArcWithCenter:circlePoint radius:newRadius startAngle:radian + self.offsetRadian endAngle:radian - self.offsetRadian clockwise:1];
-            
-            [path addQuadCurveToPoint:point2ForTouch controlPoint:controlPoint];
-            
-            [path addArcWithCenter:touchPoint radius:[self touchCircleRadius] startAngle:radianForTouch + self.offsetRadian endAngle:radianForTouch - self.offsetRadian clockwise:1];
-            
-            [path addQuadCurveToPoint:point1 controlPoint:controlPoint];
-        }
-    } else {
-        [path addArcWithCenter:touchPoint radius:[self touchCircleRadius] startAngle:0 endAngle:M_PI * 2 clockwise:1];
+        // 链接段
+        [path moveToPoint:point1];
+        [path addQuadCurveToPoint:point1ForTouch controlPoint:controlPoint];
+        [path addLineToPoint:point2ForTouch];
+        [path addQuadCurveToPoint:point2 controlPoint:controlPoint];
+        [path closePath];
+        
+        // 原来的圆
+        [circlePath addArcWithCenter:circlePoint radius:newRadius startAngle:0 endAngle:M_PI * 2 clockwise:1];
     }
     
+    // 触摸的圆
+    [circlePath addArcWithCenter:touchPoint radius:[self touchCircleRadius] startAngle:0 endAngle:M_PI * 2 clockwise:1];
+    
+    // 两个圆的连接段
     self.shapeLayer.path = path.CGPath;
+    self.subShapeLayer.path = circlePath.CGPath;
 }
 #pragma mark End
 
@@ -296,34 +312,14 @@
 - (void)shakeAnimationFromPoint:(CGPoint)fromPoint toPoint:(CGPoint)toPoint layer:(CALayer *)layer
 {
     CASpringAnimation *animation = [CASpringAnimation animationWithKeyPath:@"position"];
-    animation.initialVelocity = 5;
-    animation.damping = 10;
-    animation.stiffness = 100;
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+    animation.initialVelocity = 0;
+    animation.damping = 0.6;
     animation.fromValue = [NSValue valueWithCGPoint:fromPoint];
     animation.toValue = [NSValue valueWithCGPoint:toPoint];
-    animation.duration = animation.settlingDuration;
-    [layer addAnimation:animation forKey:@"shake"];
+    animation.duration = 0.25;
+    [layer addAnimation:animation forKey:@"springAnimation"];
 }
-
-//- (NSMutableArray *)animationValues:(id)fromValue toValue:(id)toValue usingSpringWithDamping:(CGFloat)damping initialSpringVelocity:(CGFloat)velocity duration:(CGFloat)duration{
-//    //60个关键帧
-//    NSInteger numOfPoints  = duration * 60;
-//    NSMutableArray *values = [NSMutableArray arrayWithCapacity:numOfPoints];
-//    for (NSInteger i = 0; i < numOfPoints; i++) {
-//        [values addObject:@(0.0)];
-//    }
-//    //差值
-//    printf("values ----------- ");
-//    CGFloat d_value = [toValue floatValue] - [fromValue floatValue];
-//    for (NSInteger point = 0; point < numOfPoints; point++) {
-//        CGFloat x = (CGFloat)point / (CGFloat)numOfPoints;
-//        CGFloat value = [toValue floatValue] - d_value * (pow(M_E, -damping * x) * cos(velocity * x)); //1 y = 1-e^{-5x} * cos(30x)
-//        printf("%.2f ", value);
-//        values[point] = @(value);
-//    }
-//    printf("\n");
-//    return values;
-//}
 #pragma mark End
 
 @end
