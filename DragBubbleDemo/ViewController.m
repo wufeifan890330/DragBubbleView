@@ -20,12 +20,12 @@
     bubble.backgroundColor = [UIColor cyanColor];
     bubble.tag = 999;
     bubble.frame = CGRectMake((self.view.bounds.size.width - 300) / 2, (self.view.bounds.size.height - 300) / 2, 300, 300);
-//    // config. can ignore.
-//    bubble.circlePoint = CGPointMake(275, 25);
-//    bubble.circleRadius = 25;
-//    bubble.touchCircleRadius = 8;
-//    bubble.maxDistance = 200;
-//    //    bubble.offsetRadian = M_PI / 3;
+    // config. can ignore.
+    bubble.circlePoint = CGPointMake(275, 25);
+    bubble.circleRadius = 25;
+    bubble.touchCircleRadius = 8;
+    bubble.maxDistance = 200;
+    //    bubble.offsetRadian = M_PI / 3;
     [self.view addSubview:bubble];
     // Do any additional setup after loading the view, typically from a nib.
 }
