@@ -15,6 +15,7 @@
 		6049C4891E4B5AF4000F850E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6049C4871E4B5AF4000F850E /* LaunchScreen.storyboard */; };
 		6049C4921E4B5B03000F850E /* WFFDragBubbleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6049C4911E4B5B03000F850E /* WFFDragBubbleView.m */; };
 		604C12AD1E4C1DFD00DD9984 /* 示意图.png in Resources */ = {isa = PBXBuildFile; fileRef = 604C12AC1E4C1DFD00DD9984 /* 示意图.png */; };
+		604C12AF1E4C1E8300DD9984 /* 效果.gif in Resources */ = {isa = PBXBuildFile; fileRef = 604C12AE1E4C1E8300DD9984 /* 效果.gif */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		6049C4901E4B5B03000F850E /* WFFDragBubbleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WFFDragBubbleView.h; sourceTree = "<group>"; };
 		6049C4911E4B5B03000F850E /* WFFDragBubbleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WFFDragBubbleView.m; sourceTree = "<group>"; };
 		604C12AC1E4C1DFD00DD9984 /* 示意图.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "示意图.png"; sourceTree = "<group>"; };
+		604C12AE1E4C1E8300DD9984 /* 效果.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = "效果.gif"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +72,7 @@
 				6049C4901E4B5B03000F850E /* WFFDragBubbleView.h */,
 				6049C4911E4B5B03000F850E /* WFFDragBubbleView.m */,
 				604C12AC1E4C1DFD00DD9984 /* 示意图.png */,
+				604C12AE1E4C1E8300DD9984 /* 效果.gif */,
 				6049C4821E4B5AF4000F850E /* Main.storyboard */,
 				6049C4851E4B5AF4000F850E /* Assets.xcassets */,
 				6049C4871E4B5AF4000F850E /* LaunchScreen.storyboard */,
@@ -145,6 +148,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				604C12AF1E4C1E8300DD9984 /* 效果.gif in Resources */,
 				6049C4891E4B5AF4000F850E /* LaunchScreen.storyboard in Resources */,
 				604C12AD1E4C1DFD00DD9984 /* 示意图.png in Resources */,
 				6049C4861E4B5AF4000F850E /* Assets.xcassets in Resources */,
